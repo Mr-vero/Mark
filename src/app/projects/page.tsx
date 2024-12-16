@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Layout from '../components/Layout';
 import { Card } from '../components/ui/Card';
+import { EditProjectModal } from '../components/EditProjectModal';
 import { useApp } from '../context/AppContext';
 import { Project } from '../types';
 import { slideUp, staggerChildren } from '../utils/animations';
@@ -23,6 +24,7 @@ export default function Projects() {
     status: 'not-started' as const
   });
   const [isCreating, setIsCreating] = useState(false);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   const addProject = () => {
     if (newProject.title.trim()) {
@@ -37,6 +39,19 @@ export default function Projects() {
       setProjects([...projects, project]);
       setNewProject({ title: '', description: '', status: 'not-started' });
       setIsCreating(false);
+    }
+  };
+
+  const handleEditProject = (updatedProject: Project) => {
+    setProjects(projects.map(p => 
+      p.id === updatedProject.id ? updatedProject : p
+    ));
+    setEditingProject(null);
+  };
+
+  const handleDeleteProject = (id: number) => {
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      setProjects(projects.filter(p => p.id !== id));
     }
   };
 
@@ -111,10 +126,12 @@ export default function Projects() {
               <motion.div
                 key={project.id}
                 variants={slideUp}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => router.push(`/projects/${project.id}`)}
+                className="relative group"
               >
-                <Card className="p-4 h-full cursor-pointer">
+                <Card 
+                  className="p-4 h-full cursor-pointer"
+                  onClick={() => router.push(`/projects/${project.id}`)}
+                >
                   <div 
                     className="w-full h-24 rounded-xl mb-3"
                     style={{ 
@@ -151,11 +168,45 @@ export default function Projects() {
                     </span>
                   </div>
                 </Card>
+                {/* Edit and Delete buttons */}
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingProject(project);
+                    }}
+                    className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    ✏️
+                  </motion.button>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProject(project.id);
+                    }}
+                    className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    🗑️
+                  </motion.button>
+                </div>
               </motion.div>
             ))}
           </div>
         </motion.div>
       </div>
+
+      {/* Edit Project Modal */}
+      <AnimatePresence>
+        {editingProject && (
+          <EditProjectModal
+            project={editingProject}
+            onSave={handleEditProject}
+            onCancel={() => setEditingProject(null)}
+          />
+        )}
+      </AnimatePresence>
     </Layout>
   );
 }

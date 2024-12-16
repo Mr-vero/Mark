@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/Layout';
 import { Card } from '../components/ui/Card';
+import { EditNoteModal } from '../components/EditNoteModal';
 import { useApp } from '../context/AppContext';
 import { Note } from '../types';
 import { slideUp, staggerChildren } from '../utils/animations';
@@ -19,6 +20,7 @@ export default function Notes() {
   const { notes, setNotes } = useApp();
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'personal' | 'work' | 'ideas'>('all');
   const [isCreating, setIsCreating] = useState(false);
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [newNote, setNewNote] = useState({
     title: '',
     content: '',
@@ -49,8 +51,17 @@ export default function Notes() {
     }
   };
 
+  const handleEditNote = (updatedNote: Note) => {
+    setNotes(notes.map(note => 
+      note.id === updatedNote.id ? updatedNote : note
+    ));
+    setEditingNote(null);
+  };
+
   const deleteNote = (id: number) => {
-    setNotes(notes.filter(note => note.id !== id));
+    if (window.confirm('Are you sure you want to delete this note?')) {
+      setNotes(notes.filter(note => note.id !== id));
+    }
   };
 
   return (
@@ -74,6 +85,24 @@ export default function Notes() {
             </motion.button>
           </div>
 
+          {/* Category Tabs */}
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {categories.map(category => (
+              <motion.button
+                key={category.id}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedCategory(category.id as typeof selectedCategory)}
+                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap
+                  ${selectedCategory === category.id 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-gray-100 dark:bg-gray-800'
+                  }`}
+              >
+                {category.label}
+              </motion.button>
+            ))}
+          </div>
+
           {/* Search Bar */}
           <div className="relative">
             <input
@@ -81,27 +110,11 @@ export default function Notes() {
               placeholder="Search notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-3 pl-10 rounded-xl bg-gray-100 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 pl-10 rounded-xl bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500"
             />
-            <span className="absolute left-3 top-3 text-gray-400">🔍</span>
-          </div>
-
-          {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4">
-            {categories.map(category => (
-              <motion.button
-                key={category.id}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap
-                  ${selectedCategory === category.id
-                    ? `${category.color || 'bg-blue-500'} text-white`
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                  }`}
-              >
-                {category.label}
-              </motion.button>
-            ))}
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+              🔍
+            </span>
           </div>
 
           {/* Create Note Form */}
@@ -162,47 +175,63 @@ export default function Notes() {
             variants={staggerChildren}
             className="grid gap-4"
           >
-            <AnimatePresence>
-              {filteredNotes.map(note => (
-                <motion.div
-                  key={note.id}
-                  variants={slideUp}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                >
-                  <Card className="p-4 relative group">
+            {filteredNotes.map(note => (
+              <motion.div
+                key={note.id}
+                variants={slideUp}
+                layout
+                className="relative group"
+              >
+                <Card className="p-4">
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setEditingNote(note)}
+                      className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-50 dark:hover:bg-gray-700"
+                    >
+                      ✏️
+                    </motion.button>
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={() => deleteNote(note.id)}
-                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-opacity"
+                      className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
-                      <span className="text-red-500">×</span>
+                      🗑️
                     </motion.button>
-                    <h3 className="font-semibold text-lg pr-8">{note.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm line-clamp-3">
-                      {note.content}
-                    </p>
-                    <div className="flex justify-between items-center mt-4">
-                      <span className="text-xs text-gray-500">
-                        {new Date(note.date).toLocaleDateString()}
-                      </span>
-                      <span className={`text-xs px-2 py-1 rounded-full
-                        ${note.category === 'personal' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                          note.category === 'work' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
-                          'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}`}
-                      >
-                        {note.category}
-                      </span>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+                  </div>
+                  <h3 className="font-semibold text-lg pr-16">{note.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm line-clamp-3">
+                    {note.content}
+                  </p>
+                  <div className="flex justify-between items-center mt-4">
+                    <span className="text-xs text-gray-500">
+                      {new Date(note.date).toLocaleDateString()}
+                    </span>
+                    <span className={`text-xs px-2 py-1 rounded-full
+                      ${note.category === 'personal' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                        note.category === 'work' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+                        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}`}
+                    >
+                      {note.category}
+                    </span>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Edit Note Modal */}
+      <AnimatePresence>
+        {editingNote && (
+          <EditNoteModal
+            note={editingNote}
+            onSave={handleEditNote}
+            onCancel={() => setEditingNote(null)}
+          />
+        )}
+      </AnimatePresence>
     </Layout>
   );
 } 

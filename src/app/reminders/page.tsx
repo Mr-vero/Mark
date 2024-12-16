@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/Layout';
 import { Card } from '../components/ui/Card';
+import { EditReminderModal } from '../components/EditReminderModal';
 import { useApp } from '../context/AppContext';
 import { Reminder } from '../types';
 import { slideUp, staggerChildren } from '../utils/animations';
@@ -24,6 +25,7 @@ const recurringOptions = [
 export default function Reminders() {
   const { reminders, setReminders } = useApp();
   const [isCreating, setIsCreating] = useState(false);
+  const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [newReminder, setNewReminder] = useState({
     title: '',
     description: '',
@@ -62,6 +64,13 @@ export default function Reminders() {
     }
   };
 
+  const handleEditReminder = (updatedReminder: Reminder) => {
+    setReminders(reminders.map(reminder => 
+      reminder.id === updatedReminder.id ? updatedReminder : reminder
+    ));
+    setEditingReminder(null);
+  };
+
   const toggleReminder = (id: number) => {
     setReminders(reminders.map(reminder =>
       reminder.id === id ? { ...reminder, completed: !reminder.completed } : reminder
@@ -69,15 +78,8 @@ export default function Reminders() {
   };
 
   const deleteReminder = (id: number) => {
-    setReminders(reminders.filter(reminder => reminder.id !== id));
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    if (window.confirm('Are you sure you want to delete this reminder?')) {
+      setReminders(reminders.filter(reminder => reminder.id !== id));
     }
   };
 
@@ -113,7 +115,7 @@ export default function Reminders() {
                 <Card className="p-4 space-y-4">
                   <input
                     type="text"
-                    placeholder="Reminder title..."
+                    placeholder="Reminder title"
                     value={newReminder.title}
                     onChange={(e) => setNewReminder({...newReminder, title: e.target.value})}
                     className="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500"
@@ -122,8 +124,8 @@ export default function Reminders() {
                     placeholder="Description (optional)"
                     value={newReminder.description}
                     onChange={(e) => setNewReminder({...newReminder, description: e.target.value})}
-                    rows={2}
                     className="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500"
+                    rows={2}
                   />
                   <div className="grid grid-cols-2 gap-4">
                     <input
@@ -161,7 +163,7 @@ export default function Reminders() {
                       onClick={addReminder}
                       className="flex-1 px-4 py-3 bg-blue-500 text-white rounded-xl"
                     >
-                      Set Reminder
+                      Add Reminder
                     </motion.button>
                     <motion.button
                       whileTap={{ scale: 0.95 }}
@@ -188,75 +190,95 @@ export default function Reminders() {
                   })}
                 </h2>
                 <div className="space-y-3">
-                  <AnimatePresence>
-                    {groupedReminders[date].map(reminder => (
-                      <motion.div
-                        key={reminder.id}
-                        variants={slideUp}
-                        layout
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                      >
-                        <Card className="p-4">
-                          <div className="flex items-start gap-4">
-                            <motion.div
-                              whileTap={{ scale: 1.2 }}
-                              className="flex-shrink-0 mt-1"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={reminder.completed}
-                                onChange={() => toggleReminder(reminder.id)}
-                                className="h-5 w-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
-                              />
-                            </motion.div>
-                            <div className="flex-1">
-                              <div className="flex justify-between">
-                                <h3 className={`font-semibold ${reminder.completed ? 'line-through text-gray-400' : ''}`}>
-                                  {reminder.title}
-                                </h3>
+                  {groupedReminders[date].map(reminder => (
+                    <motion.div
+                      key={reminder.id}
+                      variants={slideUp}
+                      layout
+                      className="relative group"
+                    >
+                      <Card className="p-4">
+                        <div className="flex items-start gap-4">
+                          <motion.div
+                            whileTap={{ scale: 1.2 }}
+                            className="flex-shrink-0 mt-1"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={reminder.completed}
+                              onChange={() => toggleReminder(reminder.id)}
+                              className="h-5 w-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                            />
+                          </motion.div>
+                          <div className="flex-1">
+                            <div className="flex justify-between">
+                              <h3 className={`font-semibold ${reminder.completed ? 'line-through text-gray-400' : ''}`}>
+                                {reminder.title}
+                              </h3>
+                              <div className="flex gap-2">
+                                <motion.button
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => setEditingReminder(reminder)}
+                                  className="p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  ✏️
+                                </motion.button>
                                 <motion.button
                                   whileTap={{ scale: 0.95 }}
                                   onClick={() => deleteReminder(reminder.id)}
-                                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+                                  className="p-2 opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
-                                  <span className="text-red-500 hover:text-red-600">×</span>
+                                  🗑️
                                 </motion.button>
                               </div>
-                              {reminder.description && (
-                                <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
-                                  {reminder.description}
-                                </p>
+                            </div>
+                            {reminder.description && (
+                              <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+                                {reminder.description}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className="text-xs text-gray-500">
+                                {new Date(reminder.datetime).toLocaleTimeString([], { 
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                              {reminder.recurring !== 'none' && (
+                                <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full">
+                                  Repeats {reminder.recurring}
+                                </span>
                               )}
-                              <div className="flex items-center gap-2 mt-2">
-                                <span className="text-xs text-gray-500">
-                                  {new Date(reminder.datetime).toLocaleTimeString([], { 
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  })}
-                                </span>
-                                {reminder.recurring !== 'none' && (
-                                  <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full">
-                                    Repeats {reminder.recurring}
-                                  </span>
-                                )}
-                                <span className={`text-xs px-2 py-1 rounded-full ${getPriorityColor(reminder.priority)}`}>
-                                  {reminder.priority}
-                                </span>
-                              </div>
+                              <span className={`text-xs px-2 py-1 rounded-full
+                                ${reminder.priority === 'high' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                                  reminder.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                                  'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}`}
+                              >
+                                {reminder.priority}
+                              </span>
                             </div>
                           </div>
-                        </Card>
-                      </motion.div>
-                    ))}
-                  </AnimatePresence>
+                        </div>
+                      </Card>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
             ))}
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Edit Reminder Modal */}
+      <AnimatePresence>
+        {editingReminder && (
+          <EditReminderModal
+            reminder={editingReminder}
+            onSave={handleEditReminder}
+            onCancel={() => setEditingReminder(null)}
+          />
+        )}
+      </AnimatePresence>
     </Layout>
   );
 } 
