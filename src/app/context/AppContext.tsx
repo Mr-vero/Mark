@@ -6,6 +6,8 @@ import { Todo } from '../pages/todos';
 import { Project } from '../pages/projects';
 import { Reminder } from '../pages/reminders';
 
+type Theme = 'light' | 'dark';
+
 interface AppContextType {
   notes: Note[];
   setNotes: (notes: Note[]) => void;
@@ -15,7 +17,7 @@ interface AppContextType {
   setProjects: (projects: Project[]) => void;
   reminders: Reminder[];
   setReminders: (reminders: Reminder[]) => void;
-  theme: 'light' | 'dark';
+  theme: Theme;
   toggleTheme: () => void;
 }
 
@@ -26,35 +28,46 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [reminders, setReminders] = useState<Reminder[]>([]);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<Theme>('light');
 
+  // Load data from localStorage on mount
   useEffect(() => {
-    // Load data from localStorage
-    const loadData = () => {
-      const savedNotes = localStorage.getItem('notes');
-      const savedTodos = localStorage.getItem('todos');
-      const savedProjects = localStorage.getItem('projects');
-      const savedReminders = localStorage.getItem('reminders');
-      const savedTheme = localStorage.getItem('theme');
+    const savedNotes = localStorage.getItem('notes');
+    if (savedNotes) setNotes(JSON.parse(savedNotes));
 
-      if (savedNotes) setNotes(JSON.parse(savedNotes));
-      if (savedTodos) setTodos(JSON.parse(savedTodos));
-      if (savedProjects) setProjects(JSON.parse(savedProjects));
-      if (savedReminders) setReminders(JSON.parse(savedReminders));
-      if (savedTheme) setTheme(savedTheme as 'light' | 'dark');
-    };
+    const savedTodos = localStorage.getItem('todos');
+    if (savedTodos) setTodos(JSON.parse(savedTodos));
 
-    loadData();
+    const savedProjects = localStorage.getItem('projects');
+    if (savedProjects) setProjects(JSON.parse(savedProjects));
+
+    const savedReminders = localStorage.getItem('reminders');
+    if (savedReminders) setReminders(JSON.parse(savedReminders));
+
+    const savedTheme = localStorage.getItem('theme') as Theme;
+    if (savedTheme) setTheme(savedTheme);
   }, []);
 
-  // Save data to localStorage whenever it changes
+  // Save data to localStorage when it changes
   useEffect(() => {
     localStorage.setItem('notes', JSON.stringify(notes));
+  }, [notes]);
+
+  useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
+
+  useEffect(() => {
     localStorage.setItem('projects', JSON.stringify(projects));
+  }, [projects]);
+
+  useEffect(() => {
     localStorage.setItem('reminders', JSON.stringify(reminders));
+  }, [reminders]);
+
+  useEffect(() => {
     localStorage.setItem('theme', theme);
-  }, [notes, todos, projects, reminders, theme]);
+  }, [theme]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
@@ -62,21 +75,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{
-      notes, setNotes,
-      todos, setTodos,
-      projects, setProjects,
-      reminders, setReminders,
-      theme, toggleTheme
+      notes,
+      setNotes,
+      todos,
+      setTodos,
+      projects,
+      setProjects,
+      reminders,
+      setReminders,
+      theme,
+      toggleTheme
     }}>
       {children}
     </AppContext.Provider>
   );
 }
 
-export function useApp() {
+export const useApp = () => {
   const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error('useApp must be used within an AppProvider');
-  }
+  if (!context) throw new Error('useApp must be used within AppProvider');
   return context;
-} 
+}; 
