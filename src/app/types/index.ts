@@ -3,7 +3,9 @@ export interface Note {
   title: string;
   content: string;
   category: 'personal' | 'work' | 'ideas';
+  projectId?: number;
   date: Date;
+  color?: string;
 }
 
 export interface Todo {
@@ -12,6 +14,7 @@ export interface Todo {
   completed: boolean;
   priority: 'high' | 'medium' | 'low';
   dueDate?: Date;
+  projectId?: number;
 }
 
 export interface Project {
@@ -20,6 +23,9 @@ export interface Project {
   description: string;
   status: 'not-started' | 'in-progress' | 'completed';
   date: Date;
+  color: string;
+  notes: number[];
+  todos: number[];
 }
 
 export interface Reminder {
@@ -28,4 +34,6 @@ export interface Reminder {
   datetime: string;
   description: string;
   completed: boolean;
+  recurring?: 'daily' | 'weekly' | 'monthly' | 'none';
+  priority: 'high' | 'medium' | 'low';
 } 

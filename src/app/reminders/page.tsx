@@ -8,13 +8,40 @@ import { useApp } from '../context/AppContext';
 import { Reminder } from '../types';
 import { slideUp, staggerChildren } from '../utils/animations';
 
+const priorities = [
+  { value: 'high', label: 'High', color: 'bg-red-500' },
+  { value: 'medium', label: 'Medium', color: 'bg-yellow-500' },
+  { value: 'low', label: 'Low', color: 'bg-green-500' }
+] as const;
+
+const recurringOptions = [
+  { value: 'none', label: 'No Repeat' },
+  { value: 'daily', label: 'Daily' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'monthly', label: 'Monthly' }
+] as const;
+
 export default function Reminders() {
   const { reminders, setReminders } = useApp();
+  const [isCreating, setIsCreating] = useState(false);
   const [newReminder, setNewReminder] = useState({
     title: '',
+    description: '',
     datetime: '',
-    description: ''
+    priority: 'medium' as const,
+    recurring: 'none' as const
   });
+
+  const groupedReminders = reminders.reduce((groups, reminder) => {
+    const date = new Date(reminder.datetime).toLocaleDateString();
+    if (!groups[date]) groups[date] = [];
+    groups[date].push(reminder);
+    return groups;
+  }, {} as Record<string, Reminder[]>);
+
+  const sortedDates = Object.keys(groupedReminders).sort((a, b) => 
+    new Date(a).getTime() - new Date(b).getTime()
+  );
 
   const addReminder = () => {
     if (newReminder.title.trim() && newReminder.datetime) {
@@ -24,7 +51,14 @@ export default function Reminders() {
         completed: false
       };
       setReminders([...reminders, reminder]);
-      setNewReminder({ title: '', datetime: '', description: '' });
+      setNewReminder({
+        title: '',
+        description: '',
+        datetime: '',
+        priority: 'medium',
+        recurring: 'none'
+      });
+      setIsCreating(false);
     }
   };
 
@@ -38,6 +72,15 @@ export default function Reminders() {
     setReminders(reminders.filter(reminder => reminder.id !== id));
   };
 
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'low': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    }
+  };
+
   return (
     <Layout>
       <div className="max-w-xl mx-auto px-4 py-6">
@@ -47,83 +90,170 @@ export default function Reminders() {
           variants={staggerChildren}
           className="space-y-6"
         >
-          <Card className="p-4">
-            <motion.div variants={slideUp} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Reminder title..."
-                value={newReminder.title}
-                onChange={(e) => setNewReminder({...newReminder, title: e.target.value})}
-                className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border-none focus:ring-2 focus:ring-blue-500"
-              />
-              <input
-                type="datetime-local"
-                value={newReminder.datetime}
-                onChange={(e) => setNewReminder({...newReminder, datetime: e.target.value})}
-                className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border-none focus:ring-2 focus:ring-blue-500"
-              />
-              <textarea
-                placeholder="Description..."
-                value={newReminder.description}
-                onChange={(e) => setNewReminder({...newReminder, description: e.target.value})}
-                rows={3}
-                className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border-none focus:ring-2 focus:ring-blue-500"
-              />
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={addReminder}
-                className="w-full px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                Add Reminder
-              </motion.button>
-            </motion.div>
-          </Card>
+          {/* Header */}
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold">Reminders</h1>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsCreating(true)}
+              className="px-4 py-2 bg-blue-500 text-white rounded-full text-sm"
+            >
+              + New Reminder
+            </motion.button>
+          </div>
 
-          <motion.div variants={staggerChildren} className="space-y-3">
-            <AnimatePresence>
-              {reminders.map(reminder => (
-                <motion.div
-                  key={reminder.id}
-                  variants={slideUp}
-                  layout
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                >
-                  <Card className="p-4">
-                    <div className="flex items-start gap-4">
-                      <motion.input
-                        whileTap={{ scale: 1.2 }}
-                        type="checkbox"
-                        checked={reminder.completed}
-                        onChange={() => toggleReminder(reminder.id)}
-                        className="mt-1 h-5 w-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
-                      />
-                      <div className="flex-1">
-                        <div className="flex justify-between">
-                          <h3 className={`font-semibold ${reminder.completed ? 'line-through text-gray-400' : ''}`}>
-                            {reminder.title}
-                          </h3>
-                          <motion.button
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => deleteReminder(reminder.id)}
-                            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
-                          >
-                            <span className="text-red-500 hover:text-red-600">×</span>
-                          </motion.button>
-                        </div>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
-                          {reminder.description}
-                        </p>
-                        <p className="text-blue-500 dark:text-blue-400 text-xs mt-2">
-                          {new Date(reminder.datetime).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+          {/* Create Reminder Form */}
+          <AnimatePresence>
+            {isCreating && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <Card className="p-4 space-y-4">
+                  <input
+                    type="text"
+                    placeholder="Reminder title..."
+                    value={newReminder.title}
+                    onChange={(e) => setNewReminder({...newReminder, title: e.target.value})}
+                    className="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <textarea
+                    placeholder="Description (optional)"
+                    value={newReminder.description}
+                    onChange={(e) => setNewReminder({...newReminder, description: e.target.value})}
+                    rows={2}
+                    className="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      type="datetime-local"
+                      value={newReminder.datetime}
+                      onChange={(e) => setNewReminder({...newReminder, datetime: e.target.value})}
+                      className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <select
+                      value={newReminder.recurring}
+                      onChange={(e) => setNewReminder({...newReminder, recurring: e.target.value as Reminder['recurring']})}
+                      className="p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {recurringOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <select
+                    value={newReminder.priority}
+                    onChange={(e) => setNewReminder({...newReminder, priority: e.target.value as Reminder['priority']})}
+                    className="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {priorities.map(priority => (
+                      <option key={priority.value} value={priority.value}>
+                        {priority.label} Priority
+                      </option>
+                    ))}
+                  </select>
+                  <div className="flex gap-2">
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={addReminder}
+                      className="flex-1 px-4 py-3 bg-blue-500 text-white rounded-xl"
+                    >
+                      Set Reminder
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setIsCreating(false)}
+                      className="px-4 py-3 bg-gray-200 dark:bg-gray-700 rounded-xl"
+                    >
+                      Cancel
+                    </motion.button>
+                  </div>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Reminders List */}
+          <motion.div variants={staggerChildren} className="space-y-6">
+            {sortedDates.map(date => (
+              <div key={date}>
+                <h2 className="text-lg font-semibold mb-3">
+                  {new Date(date).toLocaleDateString(undefined, { 
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </h2>
+                <div className="space-y-3">
+                  <AnimatePresence>
+                    {groupedReminders[date].map(reminder => (
+                      <motion.div
+                        key={reminder.id}
+                        variants={slideUp}
+                        layout
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                      >
+                        <Card className="p-4">
+                          <div className="flex items-start gap-4">
+                            <motion.div
+                              whileTap={{ scale: 1.2 }}
+                              className="flex-shrink-0 mt-1"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={reminder.completed}
+                                onChange={() => toggleReminder(reminder.id)}
+                                className="h-5 w-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+                              />
+                            </motion.div>
+                            <div className="flex-1">
+                              <div className="flex justify-between">
+                                <h3 className={`font-semibold ${reminder.completed ? 'line-through text-gray-400' : ''}`}>
+                                  {reminder.title}
+                                </h3>
+                                <motion.button
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => deleteReminder(reminder.id)}
+                                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+                                >
+                                  <span className="text-red-500 hover:text-red-600">×</span>
+                                </motion.button>
+                              </div>
+                              {reminder.description && (
+                                <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+                                  {reminder.description}
+                                </p>
+                              )}
+                              <div className="flex items-center gap-2 mt-2">
+                                <span className="text-xs text-gray-500">
+                                  {new Date(reminder.datetime).toLocaleTimeString([], { 
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                                {reminder.recurring !== 'none' && (
+                                  <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-full">
+                                    Repeats {reminder.recurring}
+                                  </span>
+                                )}
+                                <span className={`text-xs px-2 py-1 rounded-full ${getPriorityColor(reminder.priority)}`}>
+                                  {reminder.priority}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </div>
+            ))}
           </motion.div>
         </motion.div>
       </div>
