@@ -12,9 +12,11 @@ import {
   FolderIcon,
   ChevronLeftIcon,
   SunIcon,
-  MoonIcon
+  MoonIcon,
+  RefreshIcon
 } from '@heroicons/react/outline';
 import { useTheme } from './ThemeProvider';
+import SyncModal from '../components/SyncModal';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -25,6 +27,7 @@ export default function Layout({ children }: LayoutProps) {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
+  const [showSync, setShowSync] = useState(false);
 
   useEffect(() => {
     setIsLoading(false);
@@ -67,27 +70,37 @@ export default function Layout({ children }: LayoutProps) {
               {currentPage}
             </motion.h1>
           </div>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={theme}
-                initial={{ rotate: -180, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 180, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {theme === 'light' ? (
-                  <MoonIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-                ) : (
-                  <SunIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </motion.button>
+          <div className="flex items-center gap-2">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowSync(true)}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <RefreshIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+            </motion.button>
+            
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={toggleTheme}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={theme}
+                  initial={{ rotate: -180, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 180, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {theme === 'light' ? (
+                    <MoonIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                  ) : (
+                    <SunIcon className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </motion.button>
+          </div>
         </div>
       </motion.header>
 
@@ -136,6 +149,8 @@ export default function Layout({ children }: LayoutProps) {
           })}
         </div>
       </motion.nav>
+
+      {showSync && <SyncModal onClose={() => setShowSync(false)} />}
     </div>
   );
 } 
