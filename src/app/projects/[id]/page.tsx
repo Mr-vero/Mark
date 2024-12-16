@@ -8,14 +8,16 @@ import { Card } from '../../components/ui/Card';
 import { useApp } from '../../context/AppContext';
 import { Note, Todo } from '../../types';
 import { slideUp, staggerChildren } from '../../utils/animations';
+import { use } from 'react';
 
-export default function ProjectDetail({ params }: { params: { id: string } }) {
+export default function ProjectDetail({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
   const router = useRouter();
   const { projects, notes, todos, setProjects, setNotes, setTodos } = useApp();
   const [activeTab, setActiveTab] = useState<'notes' | 'todos'>('notes');
   const [newItem, setNewItem] = useState({ title: '', content: '' });
 
-  const project = projects.find(p => p.id === parseInt(params.id));
+  const project = projects.find(p => p.id === parseInt(resolvedParams.id));
   if (!project) return null;
 
   const projectNotes = notes.filter(note => project.notes.includes(note.id));
