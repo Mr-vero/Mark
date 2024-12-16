@@ -14,17 +14,20 @@
     "@tailwindcss/forms": "^0.5.9",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.14.4",
+    "html5-qrcode": "^2.3.8",
     "next": "15.1.0",
     "next-pwa": "^5.6.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "qrcode.react": "^3.1.0",
-    "react-copy-to-clipboard": "^5.1.0"
+    "react": "^19.0.0",
+    "react-copy-to-clipboard": "^5.1.0",
+    "react-dom": "^19.0.0",
+    "react-qr-reader": "^3.0.0-beta-1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
+    "@types/react-copy-to-clipboard": "^5.0.7",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.1.0",

@@ -6,8 +6,8 @@ import { QRCodeSVG } from 'qrcode.react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Card } from './ui/Card';
 import { useApp } from '../context/AppContext';
-import { generateSyncCode, decodeSyncCode, exportData, importData } from '../../utils/sync';
-import QRScanner from './QRScanner';
+import { generateSyncCode, decodeSyncCode, exportData, importData } from '../utils/sync';
+import QRScanner from '../app/components/QRScanner';
 
 export default function SyncModal({ onClose }: { onClose: () => void }) {
   const { todos, projects, notes, reminders, setTodos, setProjects, setNotes, setReminders } = useApp();
