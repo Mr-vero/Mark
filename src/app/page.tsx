@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Layout from './components/Layout';
 import { Card } from './components/ui/Card';
 import { useApp } from './context/AppContext';
+import { LoadSampleDataButton } from './components/LoadSampleDataButton';
 
 export default function Home() {
   const router = useRouter();
@@ -84,6 +85,10 @@ export default function Home() {
               </p>
             </Card>
           </motion.div>
+
+          <div className="flex justify-end mb-6">
+            <LoadSampleDataButton />
+          </div>
 
           {/* Main Dashboard Content */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

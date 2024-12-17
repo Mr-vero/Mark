@@ -1,36 +1,148 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Workspace App
 
-## Getting Started
+A modern, feature-rich workspace management application built with Next.js 15, TypeScript, and Tailwind CSS. This Progressive Web App (PWA) helps users manage projects, tasks, notes, and reminders with a beautiful, responsive interface.
 
-First, run the development server:
+## 🌟 Features
 
+### Project Management
+- Create and manage multiple projects
+- Track project status (not started, in progress, completed)
+- Attach todos and notes to projects
+- Visual progress tracking
+- Custom color coding for projects
+
+### Task Management
+- Create, edit, and delete todos
+- Priority levels (high, medium, low)
+- Due date tracking
+- Filter tasks by status and priority
+- Mark tasks as completed
+
+### Note Taking
+- Organize notes by categories (personal, work, ideas)
+- Rich text formatting
+- Search functionality
+- Category-based filtering
+- Date tracking for notes
+
+### Reminders
+- Set up recurring reminders
+- Priority levels
+- Custom descriptions
+- Date and time scheduling
+- Completion tracking
+
+### Data Synchronization
+- Export/Import data as JSON
+- Generate sync codes
+- QR code sharing
+- Cross-device synchronization
+- Local storage persistence
+
+### UI/UX Features
+- Dark/Light theme support
+- Responsive design
+- Smooth animations using Framer Motion
+- Modern glass-morphism design
+- Mobile-first approach
+
+## 🛠 Technology Stack
+
+- **Framework**: Next.js 15
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: React Context
+- **Animations**: Framer Motion
+- **PWA Support**: next-pwa
+- **Icons**: Heroicons
+- **Font**: Geist
+- **QR Code**: html5-qrcode, qrcode.react
+- **Date Handling**: date-fns
+
+## 📱 PWA Features
+
+The application is fully PWA-compatible with:
+- Offline support
+- Install prompts
+- App icon
+- Splash screens
+- Service worker caching
+- Mobile-optimized viewport
+
+## 🚀 Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) with your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/
+├── app/
+│   ├── components/    # Reusable UI components
+│   ├── context/      # Global state management
+│   ├── types/        # TypeScript interfaces
+│   ├── utils/        # Helper functions
+│   └── pages/        # Application routes
+├── public/
+│   ├── icons/        # PWA icons
+│   └── manifest.json # PWA manifest
+```
 
-## Learn More
+## 🔄 Data Synchronization
 
-To learn more about Next.js, take a look at the following resources:
+The app provides multiple ways to sync data:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **File Export/Import**: Export your data as a JSON file and import it on another device
+2. **Sync Codes**: Generate and share compact sync codes
+3. **QR Codes**: Scan QR codes to sync data between devices
+4. **Local Storage**: Automatic persistence of data in browser storage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎨 Theming
 
-## Deploy on Vercel
+The application supports both light and dark themes with:
+- Automatic system preference detection
+- Manual theme toggle
+- Smooth transition animations
+- Consistent color palette
+- Accessible contrast ratios
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📱 Mobile Optimization
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Touch-friendly interface
+- Responsive layouts
+- Native-like animations
+- Bottom navigation
+- Swipe gestures
+- Pull-to-refresh
+
+## 🔒 Privacy
+
+All data is stored locally in the browser's storage. No external servers are used for data storage.
+
+## 📄 License
+
+MIT License - feel free to use this project for personal or commercial purposes.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.

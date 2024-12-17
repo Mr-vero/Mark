@@ -29,6 +29,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Load data from localStorage on mount
   useEffect(() => {
+    // Load data from localStorage or use sample data if empty
     const savedNotes = localStorage.getItem('notes');
     if (savedNotes) setNotes(JSON.parse(savedNotes));
 
