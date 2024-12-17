@@ -42,8 +42,8 @@ export function EditTodoModal({ todo, onSave, onCancel }: EditTodoModalProps) {
           </select>
           <input
             type="date"
-            value={editedTodo.dueDate || ''}
-            onChange={(e) => setEditedTodo({ ...editedTodo, dueDate: e.target.value })}
+            value={editedTodo.dueDate instanceof Date ? editedTodo.dueDate.toISOString().split('T')[0] : editedTodo.dueDate || ''}
+            onChange={(e) => setEditedTodo({ ...editedTodo, dueDate: new Date(e.target.value) })}
             className="flex-1 p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

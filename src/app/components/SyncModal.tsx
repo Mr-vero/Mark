@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useState, useRef } from 'react';
@@ -6,7 +7,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Card } from './ui/Card';
 import { useApp } from '../context/AppContext';
-import { generateSyncCode, decodeSyncCode, exportData, importData } from '../../utils/sync';
+import { generateSyncCode, decodeSyncCode, exportData, importData } from '../utils/sync'
 import QRScanner from './QRScanner';
 
 export default function SyncModal({ onClose }: { onClose: () => void }) {

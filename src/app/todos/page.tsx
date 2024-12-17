@@ -27,9 +27,13 @@ export default function Todos() {
   const [selectedPriority, setSelectedPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [isCreating, setIsCreating] = useState(false);
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
-  const [newTodo, setNewTodo] = useState({
+  const [newTodo, setNewTodo] = useState<{
+    title: string;
+    priority: Todo['priority'];
+    dueDate: string;
+  }>({
     title: '',
-    priority: 'medium' as const,
+    priority: 'medium',
     dueDate: ''
   });
 
@@ -50,8 +54,10 @@ export default function Todos() {
     if (newTodo.title.trim()) {
       const todo: Todo = {
         id: Date.now(),
-        ...newTodo,
-        completed: false
+        title: newTodo.title,
+        priority: newTodo.priority,
+        completed: false,
+        dueDate: newTodo.dueDate ? new Date(newTodo.dueDate) : undefined
       };
       setTodos([...todos, todo]);
       setNewTodo({ title: '', priority: 'medium', dueDate: '' });

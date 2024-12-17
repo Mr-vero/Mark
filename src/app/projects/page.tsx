@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useState } from 'react';
@@ -23,10 +24,14 @@ export default function Projects() {
   const { projects, setProjects } = useApp();
   const [isCreating, setIsCreating] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [newProject, setNewProject] = useState({
+  const [newProject, setNewProject] = useState<{
+    title: string;
+    description: string;
+    status: Project['status'];
+  }>({
     title: '',
     description: '',
-    status: 'not-started' as const
+    status: 'not-started'
   });
 
   const addProject = () => {

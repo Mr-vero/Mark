@@ -1,10 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Note } from '../pages/notes';
-import { Todo } from '../pages/todos';
-import { Project } from '../pages/projects';
-import { Reminder } from '../pages/reminders';
+import { Note, Todo, Project, Reminder } from '../types';
 
 type Theme = 'light' | 'dark';
 

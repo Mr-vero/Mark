@@ -1,10 +1,17 @@
 {
-    "name": "Workspace",
+    "name": "Workspace App",
     "short_name": "Workspace",
+    "description": "A modern workspace application for managing tasks, notes, and projects",
     "icons": [
       {
         "src": "/icons/icon-192x192.png",
         "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "/icons/icon-384x384.png",
+        "sizes": "384x384",
         "type": "image/png"
       },
       {
@@ -13,9 +20,11 @@
         "type": "image/png"
       }
     ],
-    "theme_color": "#FFFFFF",
-    "background_color": "#FFFFFF",
+    "theme_color": "#1F2937",
+    "background_color": "#1F2937",
     "start_url": "/",
     "display": "standalone",
-    "orientation": "portrait"
+    "orientation": "portrait",
+    "scope": "/",
+    "prefer_related_applications": false
   }

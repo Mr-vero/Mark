@@ -27,12 +27,18 @@ export default function Reminders() {
   const [isCreating, setIsCreating] = useState(false);
   const [editingReminder, setEditingReminder] = useState<Reminder | null>(null);
   const [selectedPriority, setSelectedPriority] = useState<'all' | 'high' | 'medium' | 'low'>('all');
-  const [newReminder, setNewReminder] = useState({
+  const [newReminder, setNewReminder] = useState<{
+    title: string;
+    description: string;
+    datetime: string;
+    priority: Reminder['priority'];
+    recurring: Reminder['recurring'];
+  }>({
     title: '',
     description: '',
     datetime: '',
-    priority: 'medium' as const,
-    recurring: 'none' as const
+    priority: 'medium',
+    recurring: 'none'
   });
 
   const filteredReminders = reminders

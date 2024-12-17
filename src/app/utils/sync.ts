@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const exportData = (data: any): void => {
     const fileName = `taskmaster_backup_${new Date().toISOString().split('T')[0]}.json`;
     const json = JSON.stringify(data, null, 2);

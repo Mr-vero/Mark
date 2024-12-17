@@ -21,10 +21,14 @@ export default function Notes() {
   const [isCreating, setIsCreating] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [newNote, setNewNote] = useState({
+  const [newNote, setNewNote] = useState<{
+    title: string;
+    content: string;
+    category: Note['category'];
+  }>({
     title: '',
     content: '',
-    category: 'personal' as const
+    category: 'personal'
   });
 
   const filteredNotes = notes

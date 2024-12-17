@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { Card } from './ui/Card';
-import { useApp } from '../context/AppContext';
-import { generateSyncCode, decodeSyncCode, exportData, importData } from '../utils/sync';
+import { Card } from '../app/components/ui/Card';
+import { useApp } from '../app/context/AppContext';
+import { generateSyncCode, decodeSyncCode, exportData, importData } from '../app/utils/sync';
 import QRScanner from '../app/components/QRScanner';
 
 export default function SyncModal({ onClose }: { onClose: () => void }) {

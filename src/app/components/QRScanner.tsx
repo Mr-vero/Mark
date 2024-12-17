@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 
@@ -27,7 +28,7 @@ export default function QRScanner({ onScan, onClose }: QRScannerProps) {
             onScan(decodedText);
             // Don't stop here, let the cleanup handle it
           },
-          (errorMessage) => {
+          () => {
             // Ignore errors during scanning
           }
         );

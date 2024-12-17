@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { motion } from 'framer-motion';
@@ -31,7 +32,11 @@ export default function Home() {
   // Get high priority incomplete todos
   const urgentTodos = context.todos
     .filter(t => !t.completed && t.priority === 'high')
-    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+    .sort((a, b) => {
+      if (!a.dueDate) return 1;
+      if (!b.dueDate) return -1;
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    })
     .slice(0, 5);
 
   // Get in-progress projects
@@ -73,7 +78,7 @@ export default function Home() {
               </p>
             </Card>
             <Card className="p-6 bg-gradient-to-br from-amber-500 to-amber-600 text-white">
-              <h3 className="text-lg font-medium mb-2">Today's Reminders</h3>
+              <h3 className="text-lg font-medium mb-2">Today&apos;s Reminders</h3>
               <p className="text-3xl font-bold">
                 {context.reminders.filter(r => new Date(r.datetime) >= today && new Date(r.datetime) < tomorrow).length}
               </p>
@@ -213,7 +218,7 @@ export default function Home() {
                           <div 
                             className="h-full bg-blue-500 rounded-full"
                             style={{ 
-                              width: `${(project.todos.filter(id => 
+                              width: `${(project.todos.filter((id: any) => 
                                 context.todos.find(t => t.id === id)?.completed
                               ).length / project.todos.length) * 100}%` 
                             }}

@@ -39,7 +39,7 @@ export default function ProjectDetail() {
         title: newTodo,
         completed: false,
         priority: 'medium',
-        dueDate: ''
+        dueDate: undefined
       };
       setTodos([...todos, todo]);
       project.todos.push(todo.id);

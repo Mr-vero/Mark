@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { pageTransition } from '../utils/animations';
+import { pageTransition } from '../app/utils/animations';
 import SyncModal from '../app/components/SyncModal';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
